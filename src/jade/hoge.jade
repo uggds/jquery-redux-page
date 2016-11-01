@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    meta(http-equiv="content-type" content="text/html; charset=UTF-8" )
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" )
+    script(type="text/javascript" src="./bundle.js")
+    style.
+      ul {padding: 0;}
+      li {list-style: none;}
+      .dai {display: inline-block;vertical-align: top;}
+      .chu {display: inline-block;}
+      .chu__item {display: inline-block;vertical-align: top;}
+      .chu__item__label {color: #fff; background: #3399CC;}
+  body
+    include _list
+    .content
+      ul.dai
+        each item in list
+          li.dai__item
+            span #{item.value} #{item.label}
+            ul.chu(class="chu--#{item.value}")
+              each item2 in item.item
+                li.chu__item 
+                  span.chu__item__label #{item2.value} #{item2.label}
+                  ul.shou
+                    each item3 in item2.item
+                      li.shou__item
+                        span #{item3.label}
