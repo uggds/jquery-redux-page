@@ -26,6 +26,15 @@ const buildJade = (customConfig) => {
   }))
 }
 
+gulp.task('webserver', () => {
+  gulp.src('./dist')
+    .pipe($.webserver({
+      livereload: true,
+      host: '0.0.0.0',
+      port: 3000
+    }))
+})
+
 gulp.task('jade', () => {
   return buildJade().pipe(gulp.dest(DEST))
 })

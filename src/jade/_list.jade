@@ -1,3 +1,8 @@
--
-  var list = [
-  ]
+ul.dai
+  each item in list
+    li.dai__item
+      span #{item.value} #{item.label}
+      ul.chu(class="chu--#{item.value}")
+        each item2 in item.item
+          li.chu__item 
+            span.chu__item__label #{item2.value} #{item2.label}
