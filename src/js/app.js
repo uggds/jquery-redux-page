@@ -11,6 +11,7 @@ const accordionsComponent = {
 .accordions
   each large in list
     accordionComponent
+  .view button  
 `
 }
 const accordionComponent = {
@@ -34,28 +35,6 @@ ul.sho
         span.chu__item__label #{item2.value} #{item2.label}
 `
 }
-
-page('/page2', function(){
-  $.getJSON( '/api/job.json', (json) => {
-    //$('.dai').animate({ marginLeft:'-340px',opacity:'0' }, 300 );
-    const $target = $('.dai')
-    if ($target.css("display") == "none"){
-      $target.show("slide", {direction: 'left'}, 1000, function(){
-        $target.clearQueue();
-      });
-    } else {
-      $target.hide("slide", {direction: 'left'}, 1000, function(){
-        $target.clearQueue();
-      });
-    }
-    $('.content').append(jade.render(checkComponent.template, {list: json}));
-  } )
-});
-
-$('.view').on('click', (e) => {
-  page('/page2')
-  e.preventDefault()
-})
 
 
 class Hoge {
@@ -127,7 +106,22 @@ class Fuga {
       smallIdsSum += this.list[largeId].item[id].item.length
     })
     this.ids[largeId] = smallIdsSum
-    console.log(this.ids.reduce((a,b) => { return a + b }, 0))
+    const total = this.ids.reduce((a,b) => { return a + b }, 0)
+    console.log(this.ids)
+    console.log(total)
+
+    const nextBtn = this.$el.find('.view')
+    const btnTotal = this.$el.find('.accordion__btn__total')
+    if (!btnTotal.length) {
+      nextBtn.append(Fuga.$btnTotal.text(total))
+    } else if (total) {
+      btnTotal.text(total)
+    } else {
+      btnTotal.remove()
+    }
+  }
+  static get $btnTotal() {
+    return $('<span class="accordion__btn__total"></span>') 
   }
 } 
 
@@ -144,6 +138,28 @@ $(function() {
   $('.accordion').map((i, el) => {
     const $this = $(el)
     $this.data('check', new Hoge(i, $this))
+  })
+
+  page('/page2', function(){
+    $.getJSON( '/api/job.json', (json) => {
+      //$('.dai').animate({ marginLeft:'-340px',opacity:'0' }, 300 );
+      const $target = $('.accordions')
+      if ($target.css("display") == "none"){
+        $target.show("slide", {direction: 'left'}, 1000, function(){
+          $target.clearQueue();
+        });
+      } else {
+        $target.hide("slide", {direction: 'left'}, 1000, function(){
+          $target.clearQueue();
+        });
+      }
+      $('.content').append(jade.render(checkComponent.template, {list: json}));
+    } )
+  });
+
+  $('.view').on('click', (e) => {
+    page('/page2')
+    e.preventDefault()
   })
 
 })
