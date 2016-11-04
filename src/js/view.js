@@ -3,7 +3,7 @@ import jade from 'jade'
 export default class {
 
   constructor() {
-    this.components = {}
+    this.childrenComponents = {}
   }
 
   mount($target, component, variables) {
@@ -14,7 +14,7 @@ export default class {
   }
 
   _build(template, variables) {
-    Object.keys(this.components).map((key) => {
+    Object.keys(this.childrenComponents).map((key) => {
       if (template.search(key) === -1 ) {
         return
       }
@@ -25,12 +25,12 @@ export default class {
           indent = indent + ' '
         }
       }
-      const hoge = this.components[key].replace(/\n/g,`\n${indent}`)
+      const hoge = this.childrenComponents[key].replace(/\n/g,`\n${indent}`)
       template = template.replace(key, hoge)
     })
     return jade.render(template, variables)
   }
-  component(el, component) {
-    this.components[el] = component.template
+  setChildComponent(el, component) {
+    this.childrenComponents[el] = component.template
   }
 }
