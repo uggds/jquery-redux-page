@@ -3,28 +3,6 @@ import $ from 'jquery'
 import jade from 'jade'
 import View from './view'
 
-const accordionsComponent = {
-  template: `
-.accordions
-  each large in list
-    accordionComponent
-  .view.-floatEntryBtn
-     p.-floatEntryBtn__title
-       .-floatEntryBtn__text(href="#") ぼたん
-`
-}
-const accordionComponent = {
-  template: `
-.accordion
-  .accordion__title #{large.label}
-  .accordion__content
-    each middle, index in large.item
-      .accordion__item
-        input.accordion__checkbox(type="checkbox" value="#{index}")
-        | #{middle.label}
-`
-}
-
 const checkComponent = {
   template: `
 .checkLists
@@ -48,6 +26,8 @@ class Hoge {
     this.init()
     this.checkList = []
   }
+
+
   init() {
     this._eventify()
   }
@@ -86,15 +66,25 @@ class Hoge {
   static get $countDiv() {
     return $('<span class="accordion__count"></span>')
   }
+  static get template() {
+    return `
+.accordion
+  .accordion__title #{large.label}
+  .accordion__content
+    each middle, index in large.item
+      .accordion__item
+        input.accordion__checkbox(type="checkbox" value="#{index}")
+        | #{middle.label}`
+  }
 }
 
-class Fuga {
-  constructor($el, list) {
-    this.$el = $el
-    this.init()
-    this.list = list
-    this.ids = new Array( list.length ).map(() => { return 0 })
+class Accordions {
+  constructor(variables) {
+    this.$el = Accordions.$el
+    this.list = variables.list
+    this.ids = []
     this.checkList = {}
+    this.init()
   }
   init() {
     this._eventify()
@@ -102,7 +92,6 @@ class Fuga {
   _eventify() {
     this.$el.find('.accordion').on('click', this._onClick.bind(this))
   }
-
   _onClick(e) {
     const largeId = $(e.currentTarget).data('check').index
     const middleIds = $(e.currentTarget).data('check').checkList
@@ -124,7 +113,7 @@ class Fuga {
     const nextBtn = this.$el.find('.-floatEntryBtn__text')
     const btnTotal = this.$el.find('.accordion__btn__total')
     if (!btnTotal.length) {
-      nextBtn.append(Fuga.$btnTotal.text(total))
+      nextBtn.append(Accordions.$btnTotal.text(total))
     } else if (total) {
       btnTotal.text(total)
     } else {
@@ -134,13 +123,26 @@ class Fuga {
   static get $btnTotal() {
     return $('<span class="accordion__btn__total -floatEntryBtn__icon"></span>')
   }
+  static get template() {
+    return `
+.accordions
+  each large in list
+    accordionComponent
+  .view.-floatEntryBtn
+     p.-floatEntryBtn__title
+     .-floatEntryBtn__text(href="#") ぼたん`
+  }
+  
+  static get $el() {
+    return $('.accordions') 
+  }
 }
 
 
 $(function() {
   let fuga
-  page('/entry/tssmp/step4/page2', function(){
-    $.getJSON( '/entry/tssmp/abst/js/list1.json', (list) => {
+  page('/page2', function(){
+    $.getJSON( '/api/job.json', (list) => {
       const $target = $('.accordions')
       // filter
       const checkList = $target.data('values')
@@ -153,13 +155,12 @@ $(function() {
       fuga = $target.detach()
       $('.content').append(jade.render(checkComponent.template, {list, filter}));
       $('.back').on('click', (e) => {
-        page('/entry/tssmp/step4/page1')
+        page('/page1')
         e.preventDefault()
       })
     } )
-    console.log('hogehogehoge')
   })
-  page('/entry/tssmp/step4/page1', function(){
+  page('/page1', function(){
     const $target = $('.checkLists')
     $target.detach()
     $('.content').append(fuga);
@@ -167,11 +168,11 @@ $(function() {
 })
 
 const view = new View
-view.component('accordionComponent', accordionComponent)
+view.component('accordionComponent', Hoge)
 
-$.getJSON( '/entry/tssmp/abst/js/list1.json', (list) => {
-  view.mount('.content', accordionsComponent, { list })
-  new Fuga($('.accordions'), list)
+$.getJSON( '/api/job.json', (list) => {
+  view.mount($('.content'), Accordions, { list })
+
   $('.accordion__title').on(`click`, (e) => {
     const $this = $(e.currentTarget)
     const $slideContent = $this.next()
@@ -183,7 +184,7 @@ $.getJSON( '/entry/tssmp/abst/js/list1.json', (list) => {
     $this.data('check', new Hoge(i, $this))
   })
   $('.view').on('click', (e) => {
-    page('/entry/tssmp/step4/page2')
+    page('/page2')
     e.preventDefault()
   })
 })
