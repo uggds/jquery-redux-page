@@ -3,21 +3,20 @@ import $ from 'jquery'
 import jade from 'jade'
 import View from './view'
 
-// const template = require('../../../jade/entry/tssmp/_list.jade')
-// const template2 = require('../../../jade/entry/tssmp/_list2.jade')
-
 const accordionsComponent = {
   template: `
 .accordions
   each large in list
     accordionComponent
-  .view button  
+  .view.-floatEntryBtn
+     p.-floatEntryBtn__title
+       .-floatEntryBtn__text(href="#") ぼたん
 `
 }
 const accordionComponent = {
   template: `
 .accordion
-  .accordion__title #{large.value} #{large.label}
+  .accordion__title #{large.label}
   .accordion__content
     each middle, index in large.item
       .accordion__item
@@ -28,11 +27,16 @@ const accordionComponent = {
 
 const checkComponent = {
   template: `
-ul.sho
-  each item in list
-    each item2 in item.item
-      li.chu__item 
-        span.chu__item__label #{item2.value} #{item2.label}
+.checkLists
+  each large in list
+    each middle, index in large.item
+      if filter.includes(middle.value)
+        .checkList #{middle.label}
+          each small in middle.item
+            .checkList__item #{small.value} #{small.label}
+  .back.-floatEntryBtn
+     p.-floatEntryBtn__title
+       a.-floatEntryBtn__text(href="#") ぼたん
 `
 }
 
@@ -45,10 +49,10 @@ class Hoge {
     this.checkList = []
   }
   init() {
-    this._eventify() 
+    this._eventify()
   }
   _eventify() {
-    this.$el.find('.accordion__item').on('click', this._onClick.bind(this)) 
+    this.$el.find('.accordion__item').on('click', this._onClick.bind(this))
   }
 
   _onClick(e) {
@@ -80,9 +84,9 @@ class Hoge {
   }
 
   static get $countDiv() {
-    return $('<span class="accordion__count"></span>') 
+    return $('<span class="accordion__count"></span>')
   }
-} 
+}
 
 class Fuga {
   constructor($el, list) {
@@ -90,27 +94,34 @@ class Fuga {
     this.init()
     this.list = list
     this.ids = new Array( list.length ).map(() => { return 0 })
+    this.checkList = {}
   }
   init() {
-    this._eventify() 
+    this._eventify()
   }
   _eventify() {
-    this.$el.find('.accordion').on('click', this._onClick.bind(this)) 
+    this.$el.find('.accordion').on('click', this._onClick.bind(this))
   }
 
   _onClick(e) {
     const largeId = $(e.currentTarget).data('check').index
     const middleIds = $(e.currentTarget).data('check').checkList
     let smallIdsSum = 0
+    let middleValues = [] 
     middleIds.forEach((id) => {
       smallIdsSum += this.list[largeId].item[id].item.length
+      middleValues.push(this.list[largeId].item[id].value)
     })
     this.ids[largeId] = smallIdsSum
-    const total = this.ids.reduce((a,b) => { return a + b }, 0)
-    console.log(this.ids)
-    console.log(total)
+    const total = this.ids.reduce(function(a,b) { return a + b }, 0)
 
-    const nextBtn = this.$el.find('.view')
+    this.checkList[largeId] = middleValues
+    this.$el.data('values', this.checkList)
+    console.log('middleValues : ' + middleValues)
+    console.log('ids : ' + this.ids)
+    console.log('total : ' + total)
+
+    const nextBtn = this.$el.find('.-floatEntryBtn__text')
     const btnTotal = this.$el.find('.accordion__btn__total')
     if (!btnTotal.length) {
       nextBtn.append(Fuga.$btnTotal.text(total))
@@ -121,17 +132,49 @@ class Fuga {
     }
   }
   static get $btnTotal() {
-    return $('<span class="accordion__btn__total"></span>') 
+    return $('<span class="accordion__btn__total -floatEntryBtn__icon"></span>')
   }
-} 
+}
 
 
 $(function() {
+  let fuga
+  page('/entry/tssmp/step4/page2', function(){
+    $.getJSON( '/entry/tssmp/abst/js/list1.json', (list) => {
+      const $target = $('.accordions')
+      // filter
+      const checkList = $target.data('values')
+      console.log(checkList)
+      let filter = []
+      Object.keys(checkList).forEach((key) => {
+        filter.push(...checkList[key])
+      })
+      console.log(filter)
+      fuga = $target.detach()
+      $('.content').append(jade.render(checkComponent.template, {list, filter}));
+      $('.back').on('click', (e) => {
+        page('/entry/tssmp/step4/page1')
+        e.preventDefault()
+      })
+    } )
+    console.log('hogehogehoge')
+  })
+  page('/entry/tssmp/step4/page1', function(){
+    const $target = $('.checkLists')
+    $target.detach()
+    $('.content').append(fuga);
+  })
+})
+
+const view = new View
+view.component('accordionComponent', accordionComponent)
+
+$.getJSON( '/entry/tssmp/abst/js/list1.json', (list) => {
+  view.mount('.content', accordionsComponent, { list })
+  new Fuga($('.accordions'), list)
   $('.accordion__title').on(`click`, (e) => {
     const $this = $(e.currentTarget)
     const $slideContent = $this.next()
-    $this.find(`.js-slide__icon`).css(
-      `transform`, $slideContent.is(`:visible`) ? `translate(0%, -50%) rotate(90deg)` : `translate(0%, -50%) rotate(-90deg)`)
     $slideContent.slideToggle()
   })
 
@@ -139,38 +182,8 @@ $(function() {
     const $this = $(el)
     $this.data('check', new Hoge(i, $this))
   })
-
-  page('/page2', function(){
-    $.getJSON( '/api/job.json', (json) => {
-      //$('.dai').animate({ marginLeft:'-340px',opacity:'0' }, 300 );
-      const $target = $('.accordions')
-      if ($target.css("display") == "none"){
-        $target.show("slide", {direction: 'left'}, 1000, function(){
-          $target.clearQueue();
-        });
-      } else {
-        $target.hide("slide", {direction: 'left'}, 1000, function(){
-          $target.clearQueue();
-        });
-      }
-      $('.content').append(jade.render(checkComponent.template, {list: json}));
-    } )
-  });
-
   $('.view').on('click', (e) => {
-    page('/page2')
+    page('/entry/tssmp/step4/page2')
     e.preventDefault()
   })
-
 })
-
-const view = new View
-view.component('accordionComponent', accordionComponent)
-
-$.getJSON( '/api/job.json', (json) => {
-  view.mount('.content', accordionsComponent, { list: json })
-  new Fuga($('.accordions'), json)
-} )
-
-
-
