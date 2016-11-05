@@ -4,6 +4,7 @@ import jade from 'jade'
 import View from './view'
 
 import { AccordionsView } from './accordions'
+import { Accordion } from './accordion'
 
 const checkComponent = {
   template: `
@@ -16,57 +17,47 @@ const checkComponent = {
             .checkList__item #{small.value} #{small.label}
   .back.-floatEntryBtn
      p.-floatEntryBtn__title
-       a.-floatEntryBtn__text(href="#") ぼたん
+       a.-floatEntryBtn__text(href="/") ボタン
 `
 }
 
-
-$(function() {
-  let fuga
-  page('/page2', function(){
-    $.getJSON( '/api/job.json', (list) => {
-      const $target = $('.accordions')
-      // filter
-      const checkList = $target.data('values')
-      console.log(checkList)
-      let filter = []
-      Object.keys(checkList).forEach((key) => {
-        filter.push(...checkList[key])
-      })
-      console.log(filter)
-      fuga = $target.detach()
-      $('.content').append(jade.render(checkComponent.template, {list, filter}));
-      $('.back').on('click', (e) => {
-        page('/page1')
-        e.preventDefault()
-      })
-    } )
-  })
-  page('/page1', function(){
-    const $target = $('.checkLists')
-    $target.detach()
-    $('.content').append(fuga);
-  })
-})
-
 const view = new View
-view.setChildComponent('accordionComponent', Hoge)
+view.setChildComponent('accordionComponent', Accordion)
 
-$.getJSON( '/api/job.json', (list) => {
-  view.mount($('.content'), AccordionsView, { list })
+let fuga
+page('/', load)
+page('/page2', load2)
+page()
 
-  $('.accordion__title').on(`click`, (e) => {
-    const $this = $(e.currentTarget)
-    const $slideContent = $this.next()
-    $slideContent.slideToggle()
-  })
+function load(ctx, next){
+  if (fuga) {
+    const $target = $('.checkLists')
+    $target.remove()
+    $('.content').append(fuga);
+  } else {
+    $.getJSON( '/api/job.json', (list) => {
+      view.mount($('.content'), AccordionsView, { list })
+      $('.accordion__title').on(`click`, (e) => {
+        const $this = $(e.currentTarget)
+        const $slideContent = $this.next()
+        $slideContent.slideToggle()
+      })
+    })
+  }
+}
 
-  //$('.accordion').map((i, el) => {
-  //  const $this = $(el)
-  //  $this.data('check', new Hoge(i, $this))
-  //})
-  $('.view').on('click', (e) => {
-    page('/page2')
-    e.preventDefault()
-  })
-})
+function load2(ctx, next){
+  $.getJSON( '/api/job.json', (list) => {
+    const $target = $('.accordions')
+    const checkList = $target.data('values')
+    let filter = []
+    Object.keys(checkList).forEach((key) => {
+      filter.push(...checkList[key])
+    })
+    console.log(filter)
+    fuga = $target.detach()
+    $('.content').append(jade.render(checkComponent.template, {list, filter}));
+  } )
+}
+
+

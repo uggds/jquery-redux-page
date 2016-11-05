@@ -4,13 +4,18 @@ export default class {
 
   constructor() {
     this.childrenComponents = {}
+    this.router = false
   }
 
   mount($target, component, variables) {
     // dom append
     $target.append(this._build(component.template, variables))
     // event resistration
-    new component(variables)
+   new component(variables)
+
+    //if (this.router) {
+    //  component.setRouter(this.router)
+    //}
   }
 
   _build(template, variables) {
@@ -32,5 +37,8 @@ export default class {
   }
   setChildComponent(el, component) {
     this.childrenComponents[el] = component.template
+  }
+  setRouter(router) {
+     this.router = router
   }
 }

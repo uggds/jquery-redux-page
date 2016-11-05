@@ -19,7 +19,7 @@ export class AccordionsModel {
     this.sumSmallIdsEveryLargeId[largeId] = sumSmallIds
     this.middleValuesEveryLargeId[largeId] = middleValues
     this.total = this.sumSmallIdsEveryLargeId.reduce(function(a,b) { return a + b }, 0)
-    return this
+    return [this.total, this.middleValuesEveryLargeId]
   }
   static get total() {
     return this.total
@@ -41,23 +41,40 @@ export class AccordionsView {
     this._eventify()
   }
   _eventify() {
-    $('.accordion').map((index, el) => {
+    // children event
+    this.$el.find('.accordion').map((index, el) => {
       const $this = $(el)
       $this.data('check', new Accordion(index, $this))
     })
+
+    // onClick event
     this.$el.find('.accordion').on('click', this._onClick.bind(this))
+
+    // bind router
+    //if (this.router) {
+    //  this._bindRouter()
+    //}
   }
+
+  //_bindRouter() {
+  //  this.$el.find('.view').on('click', (e) => {
+  //    this.router.to('/page2')
+  //    e.preventDefault()
+  //  })
+  //}
+
   _onClick(e) {
     const $this = $(e.currentTarget)
     const largeId = $this.data('check').index
     const middleIds = $this.data('check').checkList
-    const result = this.accordions.count(largeId, middleIds, this.list)
-    const total = result.total
+    const [total, middleValuesEveryLargeId] = this.accordions.count(largeId, middleIds, this.list)
+    //const total = result.total
 
     const $button = this.$el.find('.-floatEntryBtn__text')
     const $total = this.$el.find('.accordion__btn__total')
 
-    this.$el.data('values', result.middleValuesEveryLargeId)
+    this.$el.data('values', middleValuesEveryLargeId)
+
     if (!$button.length) {
       $button.append(AccordionsView.$newTotal.text(total))
     } else if (total) {
@@ -76,7 +93,10 @@ export class AccordionsView {
     accordionComponent
   .view.-floatEntryBtn
      p.-floatEntryBtn__title
-     .-floatEntryBtn__text(href="#") ぼたん`
+     a.-floatEntryBtn__text(href="/page2") ぼたん`
   }
+  //setRouter(router) {
+  //  this.router = router
+  //}
 }
 
