@@ -49,33 +49,20 @@ export class AccordionsView {
 
     // onClick event
     this.$el.find('.accordion').on('click', this._onClick.bind(this))
-
-    // bind router
-    //if (this.router) {
-    //  this._bindRouter()
-    //}
   }
-
-  //_bindRouter() {
-  //  this.$el.find('.view').on('click', (e) => {
-  //    this.router.to('/page2')
-  //    e.preventDefault()
-  //  })
-  //}
 
   _onClick(e) {
     const $this = $(e.currentTarget)
     const largeId = $this.data('check').index
     const middleIds = $this.data('check').checkList
     const [total, middleValuesEveryLargeId] = this.accordions.count(largeId, middleIds, this.list)
-    //const total = result.total
 
     const $button = this.$el.find('.-floatEntryBtn__text')
     const $total = this.$el.find('.accordion__btn__total')
 
     this.$el.data('values', middleValuesEveryLargeId)
 
-    if (!$button.length) {
+    if (!$total.length) {
       $button.append(AccordionsView.$newTotal.text(total))
     } else if (total) {
       $total.text(total)
@@ -95,8 +82,5 @@ export class AccordionsView {
      p.-floatEntryBtn__title
      a.-floatEntryBtn__text(href="/page2") ぼたん`
   }
-  //setRouter(router) {
-  //  this.router = router
-  //}
 }
 

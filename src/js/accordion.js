@@ -11,7 +11,13 @@ export class Accordion {
     this._eventify()
   }
   _eventify() {
+    this.$el.find('.accordion__title').on('click', this._onClick2.bind(this))
     this.$el.find('.accordion__item').on('click', this._onClick.bind(this))
+  }
+  _onClick2(e) {
+    const $this = $(e.currentTarget)
+    const $slideContent = $this.next()
+    $slideContent.slideToggle()
   }
   _onClick(e) {
     const $child = $(e.currentTarget).find('.accordion__checkbox')[0]
