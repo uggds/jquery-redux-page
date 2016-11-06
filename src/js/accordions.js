@@ -60,7 +60,8 @@ export class AccordionsView {
     const $button = this.$el.find('.-floatEntryBtn__text')
     const $total = this.$el.find('.accordion__btn__total')
 
-    this.$el.data('values', middleValuesEveryLargeId)
+    //this.$el.data('values', middleValuesEveryLargeId)
+    this.setCheckList(middleValuesEveryLargeId)
 
     if (!$total.length) {
       $button.append(AccordionsView.$newTotal.text(total))
@@ -69,6 +70,9 @@ export class AccordionsView {
     } else {
       $total.remove()
     }
+  }
+  dispatch(container) {
+    this.setCheckList = container.setCheckList
   }
   static get $newTotal() {
     return $('<span class="accordion__btn__total -floatEntryBtn__icon"></span>')
