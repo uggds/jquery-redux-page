@@ -1,5 +1,7 @@
 import $ from 'jquery'
 import { Accordion } from './accordion'
+import { setList } from './actions'
+import store from './store'
 
 export class AccordionsModel {
   constructor() {
@@ -61,7 +63,7 @@ export class AccordionsView {
     const $total = this.$el.find('.accordion__btn__total')
 
     //this.$el.data('values', middleValuesEveryLargeId)
-    this.setCheckList(middleValuesEveryLargeId)
+    store.dispatch(setList( { checkList: middleValuesEveryLargeId }))
 
     if (!$total.length) {
       $button.append(AccordionsView.$newTotal.text(total))

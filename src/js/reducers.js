@@ -1,13 +1,9 @@
 import { handleActions } from 'redux-actions'
 
 const reducer = handleActions({
-  GET: (state, action) => ({
-    checkList: state
-  }),
-  SET: (state, action) => ({
-    checkList: action.payload.checkList
-  }),
-}, { checkList: [] })
+  SET_LIST: (state, action) => (Object.assign({}, ...state, { checkList: action.payload.checkList })),
+  SET_PAGE: (state, action) => (Object.assign({}, ...state, { page: action.payload.page })),
+}, { checkList: [], page: '' })
 
 export default reducer
 

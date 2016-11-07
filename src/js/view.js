@@ -2,16 +2,15 @@ import jade from 'jade'
 
 export default class {
 
-  constructor(store) {
+  constructor() {
     this.childrenComponents = {}
-    this.store = store
   }
 
   mount($target, component, variables) {
     // dom append
     $target.append(this._build(component.template, variables))
     // event resistration
-    this.store ? new component(variables, this.store) : new component(variables)
+    new component(variables)
   }
 
   _build(template, variables) {
