@@ -27,7 +27,7 @@
     "pug": "^2.0.0-beta6",
     "redux": "^3.6.0",
     "redux-actions": "^0.13.0",
-    "superagent": "^2.3.0",
+    "superagent": ">=3.7.0",
     "webpack": "^1.13.2"
   }
 }
